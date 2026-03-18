@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOYBOX MOTORS — Miniature Vehicle Collectibles</title>
+<link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Fredoka+One&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #FF3B30;
+    --yellow: #FFD60A;
+    --blue: #0A84FF;
+    --green: #30D158;
+    --orange: #FF9500;
+    --purple: #BF5AF2;
+    --pink: #FF2D78;
+    --bg: #FFF9ED;
+    --dark: #1A1A2E;
+    --card-bg: #FFFFFF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--dark);
+    overflow-x: hidden;
+  }
+
+  /* -------- NOISE TEXTURE OVERLAY -------- */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* -------- MARQUEE STRIP -------- */
+  .marquee-strip {
+    background: var(--dark);
+    color: var(--yellow);
+    font-family: 'Fredoka One', cursive;
+    font-size: 1rem;
+    letter-spacing: 0.08em;
+    padding: 10px 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .marquee-inner {
+    display: inline-block;
+    animation: marquee 22s linear infinite;
+  }
+  .marquee-inner span { margin: 0 2rem; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* -------- NAV -------- */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 5%;
+    background: #fff;
+    box-shadow: 0 2px 0 var(--dark);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Boogaloo', cursive;
+    font-size: 2rem;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .logo .dot { color: var(--red); }
+  nav ul { list-style: none; display: flex; gap: 2rem; }
+  nav ul a {
+    font-weight: 800;
+    font-size: 0.95rem;
+    text-decoration: none;
+    color: var(--dark);
+    position: relative;
+    padding-bottom: 2px;
+    letter-spacing: 0.04em;
+  }
+  nav ul a::after {
+    content: '';
+    position: absolute;
+    left: 0; bottom: 0;
+    width: 0; height: 3px;
+    background: var(--red);
+    border-radius: 2px;
+    transition: width 0.25s;
+  }
+  nav ul a:hover::after { width: 100%; }
+  .nav-btn {
+    background: var(--red);
+    color: #fff;
+    padding: 0.55rem 1.4rem;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    border: 2.5px solid var(--dark);
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--dark);
+    transition: transform 0.15s, box-shadow 0.15s;
+    text-decoration: none;
+  }
+  .nav-btn:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--dark); }
+
+  /* -------- HERO -------- */
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 2rem;
+    padding: 6rem 8% 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    right: -100px; top: -100px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, #FFD60A44 0%, transparent 70%);
+    z-index: 0;
+  }
+  .hero-text { position: relative; z-index: 1; }
+  .hero-badge {
+    display: inline-block;
+    background: var(--yellow);
+    border: 2.5px solid var(--dark);
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 0.35rem 1rem;
+    margin-bottom: 1.2rem;
+    letter-spacing: 0.06em;
+    box-shadow: 2px 2px 0 var(--dark);
+  }
+  .hero h1 {
+    font-family: 'Boogaloo', cursive;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: 1.05;
+    margin-bottom: 1.2rem;
+  }
+  .hero h1 .line2 { color: var(--red); -webkit-text-stroke: 2px var(--dark); }
+  .hero p {
+    font-size: 1.1rem;
+    color: #555;
+    max-width: 460px;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    background: var(--dark);
+    color: var(--yellow);
+    padding: 0.85rem 2rem;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 1rem;
+    border: 2.5px solid var(--dark);
+    cursor: pointer;
+    box-shadow: 4px 4px 0 var(--red);
+    transition: transform 0.15s, box-shadow 0.15s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-primary:hover { transform: translate(-3px,-3px); box-shadow: 7px 7px 0 var(--red); }
+  .btn-secondary {
+    background: #fff;
+    color: var(--dark);
+    padding: 0.85rem 2rem;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 1rem;
+    border: 2.5px solid var(--dark);
+    cursor: pointer;
+    box-shadow: 4px 4px 0 var(--dark);
+    transition: transform 0.15s, box-shadow 0.15s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-secondary:hover { transform: translate(-3px,-3px); box-shadow: 7px 7px 0 var(--dark); }
+
+  /* -------- HERO SCENE -------- */
+  .hero-scene {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+  .road-scene {
+    width: 100%;
+    max-width: 520px;
+    background: var(--dark);
+    border-radius: 32px;
+    border: 3px solid var(--dark);
+    padding: 2rem 1rem 1.5rem;
+    box-shadow: 8px 8px 0 var(--dark);
+    position: relative;
+    overflow: hidden;
+  }
+  .road-scene::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    top: 50%; transform: translateY(-50%);
+    height: 3px;
+    background: repeating-linear-gradient(90deg, var(--yellow) 0, var(--yellow) 30px, transparent 30px, transparent 60px);
+  }
+  .road-vehicles {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    gap: 1rem;
+    position: relative;
+    z-index: 1;
+    padding: 1rem 0;
+  }
+  .rv { text-align: center; animation: bounce 2s ease-in-out infinite; }
+  .rv:nth-child(2) { animation-delay: 0.3s; }
+  .rv:nth-child(3) { animation-delay: 0.6s; }
+  .rv:nth-child(4) { animation-delay: 0.9s; }
+  .rv:nth-child(5) { animation-delay: 1.2s; }
+  @keyframes bounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+  .rv-emoji { font-size: 2.8rem; display: block; }
+  .rv-label { font-size: 0.65rem; color: #aaa; font-weight: 700; letter-spacing: 0.06em; margin-top: 4px; }
+
+  /* -------- CATEGORIES -------- */
+  .section { padding: 5rem 8%; }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .section-title {
+    font-family: 'Boogaloo', cursive;
+    font-size: 2.6rem;
+    position: relative;
+    display: inline-block;
+  }
+  .section-title .underline-squiggle {
+    display: block;
+    height: 6px;
+    background: var(--yellow);
+    border-radius: 3px;
+    margin-top: 4px;
+  }
+  .see-all {
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: var(--red);
+    text-decoration: none;
+    border-bottom: 2px solid var(--red);
+    padding-bottom: 1px;
+    white-space: nowrap;
+  }
+
+  /* -------- CATEGORY PILLS -------- */
+  .cat-pills {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+  }
+  .cat-pill {
+    background: #fff;
+    border: 2.5px solid var(--dark);
+    border-radius: 999px;
+    padding: 0.5rem 1.3rem;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--dark);
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .cat-pill:hover, .cat-pill.active {
+    background: var(--dark);
+    color: var(--yellow);
+    transform: translate(-2px,-2px);
+    box-shadow: 5px 5px 0 var(--red);
+  }
+
+  /* -------- PRODUCT GRID -------- */
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.8rem;
+  }
+  .product-card {
+    background: var(--card-bg);
+    border: 2.5px solid var(--dark);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 5px 5px 0 var(--dark);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .product-card:hover {
+    transform: translate(-4px,-4px);
+    box-shadow: 9px 9px 0 var(--dark);
+  }
+  .card-img {
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .card-badge {
+    position: absolute;
+    top: 12px; left: 12px;
+    background: var(--red);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 2px solid var(--dark);
+    letter-spacing: 0.06em;
+  }
+  .card-badge.new { background: var(--green); }
+  .card-badge.sale { background: var(--red); }
+  .card-badge.hot { background: var(--orange); }
+  .card-body { padding: 1.2rem; }
+  .card-category {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: #999;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+  .card-name {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+  }
+  .card-stars { color: var(--yellow); font-size: 0.9rem; margin-bottom: 0.7rem; }
+  .card-stars span { color: #999; font-size: 0.8rem; font-weight: 600; }
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-price {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.5rem;
+    color: var(--dark);
+  }
+  .card-price .old { font-size: 0.9rem; color: #bbb; text-decoration: line-through; font-family: 'Nunito', sans-serif; margin-right: 4px; }
+  .add-btn {
+    background: var(--dark);
+    color: var(--yellow);
+    border: 2px solid var(--dark);
+    border-radius: 999px;
+    width: 36px; height: 36px;
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 2px 2px 0 #888;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .add-btn:hover { transform: scale(1.15); box-shadow: 3px 3px 0 #555; }
+
+  /* Card color accents */
+  .accent-red { background: #FFF0EE; }
+  .accent-blue { background: #EEF5FF; }
+  .accent-green { background: #EEFFF4; }
+  .accent-yellow { background: #FFFBEE; }
+  .accent-purple { background: #F8EEFF; }
+  .accent-orange { background: #FFF5EE; }
+  .accent-pink { background: #FFEEEE; }
+
+  /* -------- FEATURES STRIP -------- */
+  .features-strip {
+    background: var(--dark);
+    padding: 3rem 8%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+  }
+  .feature-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: #fff;
+  }
+  .feature-icon {
+    font-size: 2.5rem;
+    background: #fff1;
+    border-radius: 12px;
+    width: 60px; height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff30;
+    flex-shrink: 0;
+  }
+  .feature-text h4 { font-family: 'Fredoka One', cursive; font-size: 1.1rem; }
+  .feature-text p { font-size: 0.82rem; color: #aaa; margin-top: 2px; }
+
+  /* -------- BANNER -------- */
+  .promo-banner {
+    margin: 0 8%;
+    background: var(--yellow);
+    border: 3px solid var(--dark);
+    border-radius: 24px;
+    padding: 2.5rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 7px 7px 0 var(--dark);
+    gap: 2rem;
+    flex-wrap: wrap;
+    position: relative;
+    overflow: hidden;
+  }
+  .promo-banner::after {
+    content: '🎉🚗🏎️🚀';
+    font-size: 3rem;
+    position: absolute;
+    right: 10%;
+    opacity: 0.2;
+    letter-spacing: 0.5rem;
+  }
+  .promo-text h2 { font-family: 'Boogaloo', cursive; font-size: 2.2rem; }
+  .promo-text p { font-weight: 600; font-size: 1rem; margin-top: 4px; color: #444; }
+
+  /* -------- COLLECTIONS -------- */
+  .collections-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  @media (max-width: 900px) {
+    .collections-grid { grid-template-columns: 1fr 1fr; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-scene { display: none; }
+  }
+  @media (max-width: 600px) {
+    .collections-grid { grid-template-columns: 1fr; }
+    nav ul { display: none; }
+  }
+  .collection-card {
+    border-radius: 20px;
+    border: 2.5px solid var(--dark);
+    overflow: hidden;
+    box-shadow: 5px 5px 0 var(--dark);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.5rem;
+  }
+  .collection-card:hover {
+    transform: translate(-4px,-4px);
+    box-shadow: 9px 9px 0 var(--dark);
+  }
+  .collection-card .big-emoji {
+    position: absolute;
+    top: 50%;
+    right: 1.5rem;
+    transform: translateY(-70%);
+    font-size: 5rem;
+    animation: spin-gentle 8s linear infinite;
+  }
+  @keyframes spin-gentle { 0%{transform:translateY(-70%) rotate(0deg);} 100%{transform:translateY(-70%) rotate(360deg);} }
+  .collection-card h3 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.4rem;
+    color: #fff;
+    text-shadow: 1px 2px 0 rgba(0,0,0,0.3);
+  }
+  .collection-card p { font-size: 0.82rem; color: rgba(255,255,255,0.85); font-weight: 600; margin-top: 4px; }
+
+  .col-cars { background: linear-gradient(135deg, #FF3B30, #FF6B35); }
+  .col-bikes { background: linear-gradient(135deg, #0A84FF, #5AC8FA); }
+  .col-planes { background: linear-gradient(135deg, #30D158, #34C759); }
+  .col-trucks { background: linear-gradient(135deg, #FF9500, #FFCC02); }
+  .col-boats { background: linear-gradient(135deg, #BF5AF2, #FF2D78); }
+  .col-trains { background: linear-gradient(135deg, #1A1A2E, #444); }
+
+  /* -------- FOOTER -------- */
+  footer {
+    background: var(--dark);
+    color: #fff;
+    padding: 4rem 8% 2rem;
+    margin-top: 5rem;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 3rem;
+    margin-bottom: 3rem;
+  }
+  @media (max-width: 768px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+  .footer-logo {
+    font-family: 'Boogaloo', cursive;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--yellow);
+  }
+  .footer-desc { font-size: 0.88rem; color: #999; line-height: 1.7; max-width: 260px; }
+  footer h4 { font-family: 'Fredoka One', cursive; font-size: 1rem; margin-bottom: 1rem; color: var(--yellow); }
+  footer ul { list-style: none; }
+  footer ul li { margin-bottom: 0.6rem; }
+  footer ul li a { color: #bbb; text-decoration: none; font-size: 0.88rem; font-weight: 600; transition: color 0.2s; }
+  footer ul li a:hover { color: var(--yellow); }
+  .footer-bottom {
+    border-top: 1px solid #333;
+    padding-top: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: gap;
+    font-size: 0.82rem;
+    color: #666;
+  }
+  .social-icons { display: flex; gap: 0.8rem; }
+  .social-icon {
+    width: 36px; height: 36px;
+    background: #fff1;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .social-icon:hover { background: var(--yellow); }
+
+  /* -------- TOAST -------- */
+  #toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--dark);
+    color: var(--yellow);
+    padding: 1rem 1.5rem;
+    border-radius: 14px;
+    border: 2.5px solid var(--dark);
+    box-shadow: 5px 5px 0 var(--red);
+    font-weight: 800;
+    font-size: 0.95rem;
+    z-index: 9999;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s;
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+
+  /* -------- CART BADGE -------- */
+  .cart-wrap { position: relative; display: inline-block; }
+  #cart-count {
+    position: absolute;
+    top: -8px; right: -8px;
+    background: var(--red);
+    color: #fff;
+    border-radius: 999px;
+    width: 20px; height: 20px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+  }
+
+  /* -------- SCROLL ANIMATION -------- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+
+<!-- MARQUEE -->
+<div class="marquee-strip">
+  <div class="marquee-inner">
+    <span>🚗 RACING CARS</span><span>🏍️ SPORT BIKES</span><span>✈️ JET PLANES</span><span>🚢 CRUISE SHIPS</span><span>🚂 TRAINS</span><span>🚁 HELICOPTERS</span><span>🛸 SPACE ROCKETS</span><span>🚜 TRACTORS</span><span>🚒 FIRE TRUCKS</span><span>🚤 SPEEDBOATS</span><span>🚗 RACING CARS</span><span>🏍️ SPORT BIKES</span><span>✈️ JET PLANES</span><span>🚢 CRUISE SHIPS</span><span>🚂 TRAINS</span><span>🚁 HELICOPTERS</span><span>🛸 SPACE ROCKETS</span><span>🚜 TRACTORS</span><span>🚒 FIRE TRUCKS</span><span>🚤 SPEEDBOATS</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">🧸 TOYBOX<span class="dot">.</span>MOTORS</div>
+  <ul>
+    <li><a href="#">Shop</a></li>
+    <li><a href="#">Collections</a></li>
+    <li><a href="#">New Arrivals</a></li>
+    <li><a href="#">Deals</a></li>
+    <li><a href="#">About</a></li>
+  </ul>
+  <div class="cart-wrap">
+    <a class="nav-btn" href="#">🛒 Cart <span id="cart-count">0</span></a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <div class="hero-badge">🏆 #1 TOY VEHICLE STORE</div>
+    <h1>
+      Collect Every<br>
+      <span class="line2">Road, Sky &</span><br>
+      Sea Vehicle!
+    </h1>
+    <p>Premium die-cast and plastic toy models for every collector — from roaring race cars to soaring jets, mighty ships to speedy bikes. Build your dream fleet!</p>
+    <div class="hero-cta">
+      <a href="#shop" class="btn-primary">🚀 Shop Now</a>
+      <a href="#collections" class="btn-secondary">🗂️ Browse Collections</a>
+    </div>
+  </div>
+  <div class="hero-scene">
+    <div class="road-scene">
+      <div class="road-vehicles">
+        <div class="rv"><span class="rv-emoji">🏎️</span><span class="rv-label">F1 CAR</span></div>
+        <div class="rv"><span class="rv-emoji">🏍️</span><span class="rv-label">SPORTBIKE</span></div>
+        <div class="rv"><span class="rv-emoji">✈️</span><span class="rv-label">JET</span></div>
+        <div class="rv"><span class="rv-emoji">🚂</span><span class="rv-label">TRAIN</span></div>
+        <div class="rv"><span class="rv-emoji">🚁</span><span class="rv-label">CHOPPER</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES STRIP -->
+<div class="features-strip">
+  <div class="feature-item">
+    <div class="feature-icon">🚚</div>
+    <div class="feature-text"><h4>Free Shipping</h4><p>On all orders above ₹999</p></div>
+  </div>
+  <div class="feature-item">
+    <div class="feature-icon">🔒</div>
+    <div class="feature-text"><h4>Safe & Secure</h4><p>100% secure checkout</p></div>
+  </div>
+  <div class="feature-item">
+    <div class="feature-icon">🔄</div>
+    <div class="feature-text"><h4>Easy Returns</h4><p>30-day return policy</p></div>
+  </div>
+  <div class="feature-item">
+    <div class="feature-icon">🎁</div>
+    <div class="feature-text"><h4>Gift Wrapping</h4><p>Free on any order</p></div>
+  </div>
+</div>
+
+<!-- CATEGORIES SECTION -->
+<section class="section" id="shop">
+  <div class="section-header reveal">
+    <div class="section-title">
+      Featured Vehicles
+      <span class="underline-squiggle"></span>
+    </div>
+    <a href="#" class="see-all">See All →</a>
+  </div>
+
+  <div class="cat-pills reveal">
+    <button class="cat-pill active" onclick="filterCat('all',this)">🔥 All</button>
+    <button class="cat-pill" onclick="filterCat('car',this)">🚗 Cars</button>
+    <button class="cat-pill" onclick="filterCat('bike',this)">🏍️ Bikes</button>
+    <button class="cat-pill" onclick="filterCat('plane',this)">✈️ Aircraft</button>
+    <button class="cat-pill" onclick="filterCat('boat',this)">⛵ Boats</button>
+    <button class="cat-pill" onclick="filterCat('train',this)">🚂 Trains</button>
+    <button class="cat-pill" onclick="filterCat('special',this)">🚀 Special</button>
+  </div>
+
+  <div class="products-grid" id="products-grid">
+    <!-- JS-rendered -->
+  </div>
+</section>
+
+<!-- PROMO BANNER -->
+<div class="promo-banner reveal">
+  <div class="promo-text">
+    <h2>🎉 Mega Sale — Up to 40% OFF!</h2>
+    <p>This weekend only. No code needed. Limited stock available.</p>
+  </div>
+  <a href="#shop" class="btn-primary" style="background:var(--dark);color:var(--yellow);">Grab the Deal →</a>
+</div>
+
+<!-- COLLECTIONS -->
+<section class="section" id="collections">
+  <div class="section-header reveal">
+    <div class="section-title">
+      Shop by Category
+      <span class="underline-squiggle"></span>
+    </div>
+  </div>
+  <div class="collections-grid reveal">
+    <div class="collection-card col-cars">
+      <span class="big-emoji">🏎️</span>
+      <h3>Die-Cast Cars</h3>
+      <p>42 Models available</p>
+    </div>
+    <div class="collection-card col-bikes">
+      <span class="big-emoji">🏍️</span>
+      <h3>Motorcycles & Bikes</h3>
+      <p>28 Models available</p>
+    </div>
+    <div class="collection-card col-planes">
+      <span class="big-emoji">✈️</span>
+      <h3>Aircraft & Drones</h3>
+      <p>35 Models available</p>
+    </div>
+    <div class="collection-card col-trucks">
+      <span class="big-emoji">🚚</span>
+      <h3>Trucks & Heavy</h3>
+      <p>22 Models available</p>
+    </div>
+    <div class="collection-card col-boats">
+      <span class="big-emoji">🚢</span>
+      <h3>Ships & Boats</h3>
+      <p>19 Models available</p>
+    </div>
+    <div class="collection-card col-trains">
+      <span class="big-emoji">🚂</span>
+      <h3>Train Sets</h3>
+      <p>14 Sets available</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-logo">🧸 TOYBOX.MOTORS</div>
+      <p class="footer-desc">The ultimate destination for toy vehicle collectors of all ages. Premium quality, endless fun.</p>
+    </div>
+    <div>
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="#">New Arrivals</a></li>
+        <li><a href="#">Best Sellers</a></li>
+        <li><a href="#">On Sale</a></li>
+        <li><a href="#">Gift Sets</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Support</h4>
+      <ul>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Shipping</a></li>
+        <li><a href="#">Returns</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Press</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Toybox Motors. All rights reserved.</span>
+    <div class="social-icons">
+      <a class="social-icon" href="#">📘</a>
+      <a class="social-icon" href="#">📸</a>
+      <a class="social-icon" href="#">🐦</a>
+      <a class="social-icon" href="#">▶️</a>
+    </div>
+  </div>
+</footer>
+
+<!-- TOAST -->
+<div id="toast">✅ Added to cart!</div>
+
+<script>
+  const products = [
+    { id:1, name:'Formula 1 Racer', cat:'car', emoji:'🏎️', price:1299, old:1799, badge:'hot', accent:'accent-red', stars:5, reviews:128 },
+    { id:2, name:'Kawasaki Ninja H2', cat:'bike', emoji:'🏍️', price:899, old:null, badge:'new', accent:'accent-blue', stars:5, reviews:64 },
+    { id:3, name:'Boeing 737 Jet', cat:'plane', emoji:'✈️', price:1499, old:1999, badge:'sale', accent:'accent-green', stars:4, reviews:87 },
+    { id:4, name:'Monster Truck', cat:'car', emoji:'🚛', price:699, old:null, badge:'new', accent:'accent-yellow', stars:5, reviews:201 },
+    { id:5, name:'Space Shuttle', cat:'special', emoji:'🚀', price:2499, old:3299, badge:'hot', accent:'accent-purple', stars:5, reviews:310 },
+    { id:6, name:'Speed Boat', cat:'boat', emoji:'🚤', price:799, old:null, badge:'new', accent:'accent-blue', stars:4, reviews:45 },
+    { id:7, name:'Steam Locomotive', cat:'train', emoji:'🚂', price:1099, old:1499, badge:'sale', accent:'accent-orange', stars:5, reviews:92 },
+    { id:8, name:'Apache Helicopter', cat:'plane', emoji:'🚁', price:1899, old:null, badge:'hot', accent:'accent-pink', stars:5, reviews:155 },
+    { id:9, name:'Bugatti Chiron', cat:'car', emoji:'🏎️', price:1599, old:1899, badge:'sale', accent:'accent-red', stars:5, reviews:233 },
+    { id:10, name:'Harley Davidson', cat:'bike', emoji:'🛵', price:749, old:null, badge:'new', accent:'accent-orange', stars:4, reviews:77 },
+    { id:11, name:'Aircraft Carrier', cat:'boat', emoji:'🛳️', price:3299, old:4499, badge:'hot', accent:'accent-blue', stars:5, reviews:411 },
+    { id:12, name:'Futuristic Hovercraft', cat:'special', emoji:'🛸', price:1999, old:null, badge:'new', accent:'accent-purple', stars:5, reviews:98 },
+  ];
+
+  let cartCount = 0;
+
+  function getStars(n) {
+    return '★'.repeat(n) + '☆'.repeat(5-n);
+  }
+
+  function renderProducts(cat) {
+    const grid = document.getElementById('products-grid');
+    const filtered = cat === 'all' ? products : products.filter(p => p.cat === cat);
+    grid.innerHTML = filtered.map(p => `
+      <div class="product-card reveal" data-cat="${p.cat}">
+        <div class="card-img ${p.accent}">
+          <span style="filter:drop-shadow(0 4px 12px rgba(0,0,0,0.12))">${p.emoji}</span>
+          ${p.badge ? `<span class="card-badge ${p.badge}">${p.badge.toUpperCase()}</span>` : ''}
+        </div>
+        <div class="card-body">
+          <div class="card-category">${p.cat.toUpperCase()} MODEL</div>
+          <div class="card-name">${p.name}</div>
+          <div class="card-stars">${getStars(p.stars)} <span>(${p.reviews})</span></div>
+          <div class="card-footer">
+            <div class="card-price">
+              ${p.old ? `<span class="old">₹${p.old}</span>` : ''}₹${p.price}
+            </div>
+            <button class="add-btn" onclick="addToCart('${p.name}')">+</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+    observeReveal();
+  }
+
+  function filterCat(cat, btn) {
+    document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    renderProducts(cat);
+  }
+
+  function addToCart(name) {
+    cartCount++;
+    document.getElementById('cart-count').textContent = cartCount;
+    const toast = document.getElementById('toast');
+    toast.textContent = `✅ ${name} added to cart!`;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  // Scroll reveal
+  function observeReveal() {
+    const els = document.querySelectorAll('.reveal:not(.visible)');
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e,i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 80);
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    els.forEach(el => obs.observe(el));
+  }
+
+  // Init
+  renderProducts('all');
+  observeReveal();
+</script>
+</body>
+</html>
